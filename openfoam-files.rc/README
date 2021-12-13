@@ -1,0 +1,22 @@
+----------------------------------------------------------------------
+# Package administration (sudo)
+
+A container is generally meant to be immutable, but occasionally it can
+be useful to add/update some packages, which is usually done via 'sudo'
+to gain the necessary permissions.
+
+However, since host UID/GID values are mappped in with libnss_wrapper
+(which is ignored for 'sudo') we need an additional administration
+user for this purpose:  User=sudofoam  passwd=foam
+
+
+This "double-hop" then looks like this:
+
+    openfoam$ su - sudofoam
+    sudofoam$ sudo apt-get update
+    sudofoam$ sudo apt-get install ...
+
+
+Not as comfortable as we would like, but it is used infrequently.
+
+----------------------------------------------------------------------

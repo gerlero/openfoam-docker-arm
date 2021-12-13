@@ -1,0 +1,42 @@
+# --------------------------------*- sh -*-----------------------------------
+# File: /etc/profile.d/openfoam-00mpi.sh
+#
+# Copyright (C) 2021 OpenCFD Ltd.
+# SPDX-License-Identifier: (GPL-3.0+)
+#
+# MPI environment settings for OpenFOAM (www.openfoam.com)
+#
+# prefix: @MPI_ARCH_PATH@
+# ------------------------------------------------------------------------
+
+mpi_prefix="@MPI_ARCH_PATH@"
+if [ -d "${mpi_prefix}" ]
+then
+    case "$PATH" in
+    (*"${mpi_prefix}"/bin*) ;;
+    (*)
+        if [ -d "${mpi_prefix}/bin" ]
+        then
+            PATH="${mpi_prefix}/bin:$PATH"
+        fi
+    esac
+
+    # MANPATH... not so important (manpages may/may not be installed anyhow)
+
+    case "$LD_LIBRARY_PATH" in
+    (*"${mpi_prefix}"/lib*) ;;
+    (*)
+        if [ -d "${mpi_prefix}/lib64" ]
+        then
+            mpi_libdir="${mpi_prefix}/lib64"
+        else
+            mpi_libdir="${mpi_prefix}/lib"
+        fi
+        LD_LIBRARY_PATH="${mpi_libdir}${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}"
+        export LD_LIBRARY_PATH
+    esac
+fi
+
+unset mpi_prefix mpi_libdir
+
+# --------------------------------------------------------------------------

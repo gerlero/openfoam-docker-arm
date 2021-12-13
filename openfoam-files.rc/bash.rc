@@ -1,0 +1,34 @@
+# --------------------------------*- sh -*-----------------------------------
+# File: /openfoam/bash.rc
+#
+# Copyright (C) 2021 OpenCFD Ltd.
+# SPDX-License-Identifier: (GPL-3.0+)
+#
+# Bashrc addins for OpenFOAM (www.openfoam.com)
+#
+# Sourced from:
+# - /etc/bash.bashrc (debian)
+# - /etc/bash.bashrc.local (suse)
+# - via --rcfile (redhat)
+#
+# ---------------------------------------------------------------------------
+
+if [ -f /openfoam/profile.rc ]
+then  . /openfoam/profile.rc
+fi
+
+# Do not save ~/.bash_history
+# - HOME is mounted to host machine, and container is disposable too
+unset HISTFILE
+
+# Instead of ~/.inputrc
+
+# Ctrl- Up/Down
+bind '"\e[1;5A":history-search-backward' 2>/dev/null
+bind '"\e[1;5B":history-search-forward'  2>/dev/null
+
+# Ctrl- Left/Right
+bind '"\e[1;5C":forward-word'  2>/dev/null
+bind '"\e[1;5D":backward-word' 2>/dev/null
+
+# ---------------------------------------------------------------------------

@@ -1,0 +1,206 @@
+#!/bin/sh
+# File: /openfoam/run
+# ----------------------------------------------------------------------
+# Copyright (C) 2020-2021 OpenCFD Ltd.
+# SPDX-License-Identifier: (GPL-3.0+)
+#
+# Entry-point for OPENFOAM container with nss-wrapper for user/group
+# handling  [cf, https://github.com/atbentley/docker-nss-wrapper]
+# and
+#
+# Caller:
+#     docker run --user=uid:gid
+#
+# Requires:
+#     libnss-wrapper (debian), nss_wrapper (centos/suse)
+#
+# Note
+#     Embedded commands may trigger a "failed to resize tty..."
+#     spurious warning.
+#
+# ----------------------------------------------------------------------
+unset _foamScriptCommand
+
+while [ "$#" -gt 0 ]
+do
+    case "$1" in
+    (- | --)
+        shift
+        break   # Stop option parsing
+        ;;
+
+    (/openfoam/*)   # No recursion or direct access of local files
+        echo "Ignoring recursive command: $1" 1>&2
+        ;;
+
+    # Pseudo-commands
+    (/help | help)
+        cat /openfoam/README 2>/dev/null || \
+            echo "$0: /openfoam/README not found" 1>&2
+        exit 0
+        ;;
+
+    (-build-info | -show-api | -show-patch | -show-prefix | -version | --version)
+        if [ -f /openfoam/assets/query.sh ]
+        then sh /openfoam/assets/query.sh "$@"
+        fi
+        exit 0
+        ;;
+
+    (-h | -help* | --help*)
+        if [ -f /openfoam/assets/welcome.sh ]
+        then sh /openfoam/assets/welcome.sh
+        fi
+        cat<<HELP_USAGE
+Usage: $0 [OPTION] [application ...]
+       $0 [OPTION] [command_string]
+
+options:
+  -c            Shell commands read from the first non-option argument
+  -etc=DIR      Set additional FOAM_CONFIG_ETC
+  -build-info   Print META-INFO api/patch/build and exit
+  -show-api     Print META-INFO api value and exit
+  -show-patch   Print META-INFO patch value and exit
+  -show-prefix  Print project directory and exit
+  -verbose      Set FOAM_VERBOSE=true (interactive only)
+  -version      Same as -show-api
+  --            End of option processing (argument - is equivalent to --)
+  -help         Display short help and exit
+
+pseudo-commands:
+  /help | help  Display help text
+
+Interactive bash session with OpenFOAM environment, or run an
+OpenFOAM application (with arguments) with an OpenFOAM environment.
+
+For more information: www.openfoam.com
+and <https://develop.openfoam.com/Development/openfoam/-/wikis/>
+
+See 'more /openfoam/README' within the container.
+
+HELP_USAGE
+        # NB: spurious warning: failed to resize tty...
+        exit 0
+        ;;
+
+    (-c)  # Shell command
+        _foamScriptCommand="-c"
+        ;;
+
+    (-etc=*)
+        # Define FOAM_CONFIG_ETC for finding files
+        export FOAM_CONFIG_ETC="${1#*=}"
+        ;;
+
+    (-verbose)
+        export FOAM_VERBOSE=true
+        ;;
+
+    (*)
+        break
+        ;;
+    esac
+    shift
+done
+
+if [ -n "$_foamScriptCommand" ] && [ "$#" -eq 0 ]
+then
+    echo "$0: -c: option requires an argument" 1>&2
+    exit 1
+fi
+
+# ----------------------------------------------------------------------
+
+# Wrapping user/group
+withUID="$(id -u)"
+withGID="$(id -g)"
+
+if [ "$withUID" != 0 ]
+then
+    export USER=openfoam
+    export HOME="/home/${USER}"
+    export SHELL="/bin/bash"
+
+    export NSS_WRAPPER_GROUP=/tmp/group.nss
+    export NSS_WRAPPER_PASSWD=/tmp/passwd.nss
+
+    # group
+    grep ":${withGID}"':$' /etc/group > "$NSS_WRAPPER_GROUP"
+    grep -q : "$NSS_WRAPPER_GROUP" || \
+    echo "${USER}:x:${withGID}:" > "$NSS_WRAPPER_GROUP"
+
+    # passwd
+    echo "${USER}:x:${withUID}:${withGID}:${USER}:${HOME}:${SHELL}" > "$NSS_WRAPPER_PASSWD"
+
+    # opensuse: /usr/lib64
+    LD_PRELOAD=/usr/lib64/libnss_wrapper.so
+
+    # debian/ubuntu: /usr/lib
+    [ -e "$LD_PRELOAD" ] || LD_PRELOAD=/usr/lib/libnss_wrapper.so
+
+    export LD_PRELOAD
+fi
+
+# Normally want to work from home
+cd "${HOME}" 2>/dev/null
+unset OLDPWD
+
+# ----------------------------------------------------------------------
+
+# Dispatch: interactive/non-interactive
+
+if [ "$#" -eq 0 ] && [ -z "$_foamScriptCommand" ]
+then
+    # Interactive shell
+    # -----------------
+    export SHELL="/bin/bash"
+
+    if [ -f /openfoam/assets/welcome.sh ]
+    then sh /openfoam/assets/welcome.sh
+    fi
+
+    # RedHat has /etc/bashrc (bad to edit), and no /etc/bash.bashrc
+    # Inject our own bashrc file
+    if [ ! -f /etc/bash.bashrc ] && [ -f /openfoam/bash.rc ]
+    then
+        # Newer bash can use --init-file instead of --rcfile
+        exec "$SHELL" --rcfile /openfoam/bash.rc -i
+    else
+        exec "$SHELL" -i
+    fi
+    exit $? # Safety
+fi
+
+
+# Non-interactive shell,
+# probably non-login as well
+# ---------------------
+
+# Source bashrc within a function to preserve command-line arguments
+# Suppresses aliases as a side-effect, but non-interactive anyhow.
+sourceBashrc()
+{
+    if [ -f /openfoam/profile.rc ]
+    then  . /openfoam/profile.rc
+    fi
+}
+
+
+if [ -n "$_foamScriptCommand" ]
+then
+    # A shell command
+    sourceBashrc
+    exec /bin/bash -c "$@"
+    exit $? # Safety
+fi
+
+
+# An application
+sourceBashrc
+exec "$@"
+exitCode="$?"  # Safety
+echo "Failed to exec: $@" 1>&2
+
+exit "$exitCode"
+
+# ----------------------------------------------------------------------
