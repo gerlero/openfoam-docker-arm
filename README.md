@@ -14,18 +14,19 @@ On an M1 MacBook Air, running the `incompressible/simpleFoam/pitzDaily` tutorial
 
 ## Usage
 
-The [`openfoam-docker-arm`](https://github.com/gerlero/openfoam-docker-arm/blob/main/openfoam-docker-arm) script works just like the official `openfoam-docker` script.
+The [`openfoam-docker-arm`](openfoam-docker-arm) script works just like the official [`openfoam-docker`](https://develop.openfoam.com/packaging/containers/-/blob/main/openfoam-docker) script.
 
-First, download the script from this repository. Make it executable with:
+Run these commands in the terminal to download the script and make it executable:
 
 ```sh
-$ chmod +x openfoam-docker-arm
+curl -o openfoam-docker-arm https://raw.githubusercontent.com/gerlero/openfoam-docker-arm/main/openfoam-docker-arm
+chmod +x openfoam-docker-arm
 ```
 
-Then, launch an ARM OpenFOAM environment at any time using the script. For example:
+Then, launch an ARM-based OpenFOAM environment at any time using the script. For example:
 
 ```sh
-$ ./openfoam-docker-arm -default
+./openfoam-docker-arm -default
 ```
 
 For more details on how to use the script and OpenFOAM with Docker in general, you may want to check out the [OpenFOAM Docker page](https://develop.openfoam.com/Development/openfoam/-/wikis/precompiled/docker).
@@ -39,7 +40,7 @@ The Docker image used by the script is available as [`gerlero/openfoam2016-defau
 If you want to manually build the image, clone this repo and run:
 
 ```sh
-$ docker build --build-arg FOAM_VERSION=2106 --platform linux/arm64 -t gerlero/openfoam2106-default -f openfoam-default.Dockerfile .
+docker build --build-arg FOAM_VERSION=2106 --platform linux/arm64 -t gerlero/openfoam2106-default -f openfoam-default.Dockerfile .
 ```
 
 Note that the build can take a long time, as it will compile OpenFOAM entirely from its source code.
