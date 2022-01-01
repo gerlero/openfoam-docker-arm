@@ -13,11 +13,10 @@
 if [ -n "@PACKAGE@" ] && [ -f "@PREFIX@/@PACKAGE@"/etc/bashrc ]
 then
     . "@PREFIX@/@PACKAGE@"/etc/bashrc -- || true
-    if [ -n "$PS1" ]
-    then
-        PS1="OpenFOAM\${FOAM_API+-$FOAM_API}:"'\w/\n\u\$ '
+    case "$-" in (*i*)  # Interactive shell
+        PS1="openfoam$(foamEtcFile -show-api 2>/dev/null):"'\w/\n\u\$ '
         alias sandbox='cd ${WM_PROJECT_DIR:?}/sandbox'
-    fi
+    esac  # Interactive shell
 fi
 
 

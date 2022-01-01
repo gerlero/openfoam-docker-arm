@@ -1,8 +1,8 @@
 #!/bin/sh
-openfoamVersion="2106"
 imageBasename="gerlero/openfoam"
+openfoamVersion="2112"
 imageFlavour="-run"
-scriptVersion="2021-06-23"
+scriptVersion="2021-12-21"
 
 #------------------------------------------------------------------------------
 # =========                 |
@@ -12,10 +12,9 @@ scriptVersion="2021-06-23"
 #    \\/     M anipulation  |
 #------------------------------------------------------------------------------
 #    Copyright (C) 2016-2021 OpenCFD Ltd.
-#    Copyright (C) 2021 Gabriel S. Gerlero
+#    Copyright (C) 2021-2022 Gabriel S. Gerlero
 #------------------------------------------------------------------------------
-# License
-#     An OpenFOAM-associated file, distributed under GPL-3.0-or-later.
+# SPDX-License-Identifier: (GPL-3.0+)
 #
 # Script
 #     openfoam-docker-arm
@@ -26,7 +25,7 @@ scriptVersion="2021-06-23"
 #     Copy/link to automatically specify OpenFOAM version and image 'flavour'
 #     For example,
 #
-#        ln -s openfoam-docker-arm openfoam2106-run
+#        ln -s openfoam-docker-arm openfoam2112-run
 #
 #------------------------------------------------------------------------------
 printHelp()
@@ -42,7 +41,7 @@ options:
   -c                Shell commands read from the first non-option argument
   -data=DIR         Specify mount dir for container '/data'
   -dir=DIR          Specify mount dir for container '~/' (default: pwd)
-  -<digits>         Specify OpenFOAM version (eg, -2106)
+  -<digits>         Specify OpenFOAM version (eg, -2112)
   -base | -dev | -run | -tut | -default
                     Image flavour (default: -run).
                     Not all image flavours are necessarily available.
@@ -186,7 +185,7 @@ do
         break   # Stop option parsing
         ;;
 
-    # OpenFOAM versions (eg, -2012, -2106, etc)
+    # OpenFOAM versions (eg, -2112, -2106, -2012, etc)
     (-[1-9]*)   openfoamVersion="${1#*-}" ;;
     (-v[1-9]*)  openfoamVersion="${1#*-v}" ;;
 
