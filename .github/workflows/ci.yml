@@ -14,6 +14,7 @@ jobs:
       matrix:
         foam_version:
           - '2112'
+          - '2106'
     steps:
       -
         name: Checkout
