@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/gerlero/openfoam-docker-arm/actions/workflows/ci.yml/badge.svg)](https://github.com/gerlero/openfoam-docker-arm/actions/workflows/ci.yml)
 
-Precompiled OpenFOAM environment for ARM-based processors via Docker.
+Precompiled OpenFOAM environments for ARM-based processors via Docker.
 
 **For use on Macs with Apple silicon and other ARM-based computers.**
 
@@ -31,17 +31,13 @@ Then, launch an ARM-based OpenFOAM environment at any time using the script. For
 ./openfoam-docker-arm -default
 ```
 
-The `-default` option requests a full environment (including the tutorial suite and dependencies needed for OpenFOAM development). To ask for a specific OpenFOAM version, pass the version number as an option (as of now, `-2112` or `-2106` will work). For help on how to use the script and OpenFOAM with Docker in general, use the `-help` option and/or check out the [OpenFOAM Docker page](https://develop.openfoam.com/Development/openfoam/-/wikis/precompiled/docker).
+The `-default` option requests a full environment (including the tutorial suite and dependencies needed for OpenFOAM development). To ask for a specific OpenFOAM version, pass the version number as an option (e.g., `-2112` or `-2106`). For help on how to use the script and OpenFOAM with Docker in general, use the `-help` option and/or check out the [OpenFOAM Docker page](https://develop.openfoam.com/Development/openfoam/-/wikis/precompiled/docker).
 
 ## Details
 
-### OpenFOAM v2112
+ARM-based OpenFOAM environments are packaged in Docker images based on OpenSUSE Leap, using the official ARM binaries as recommended in the [OpenFOAM Docker FAQ](https://develop.openfoam.com/Development/openfoam/-/wikis/precompiled/docker#frequently-asked-questions). Note that this means that the base Linux distribution differs from the [official Docker images](https://hub.docker.com/u/opencfd), which use Ubuntu. The ARM-based Docker images are built here using GitHub Actions and uploaded to [Docker Hub](https://hub.docker.com/u/gerlero/).
 
-ARM-based OpenFOAM v2112 environments are packaged in Docker images based on OpenSUSE Leap, using the official ARM binaries as recommended in the [OpenFOAM Docker FAQ](https://develop.openfoam.com/Development/openfoam/-/wikis/precompiled/docker#frequently-asked-questions). Note that the base distribution differs from the [official Docker images](`https://hub.docker.com/u/opencfd`), which use Ubuntu. The ARM-based Docker images are built here using GitHub Actions and provided as [`gerlero/openfoam2112-run`](https://hub.docker.com/r/gerlero/openfoam2112-run), [`gerlero/openfoam2112-dev`](https://hub.docker.com/r/gerlero/openfoam2112-dev) and [`gerlero/openfoam2112-default`](https://hub.docker.com/r/gerlero/openfoam2112-default).
-
-### OpenFOAM v2106
-
-The ARM-based OpenFOAM v2106 Docker image is available as [`gerlero/openfoam2016-default`](https://hub.docker.com/r/gerlero/openfoam2106-default). The current version of this image offers OpenFOAM compiled from source on Ubuntu, with the `-dev` and `-run` "slimmer" images provided as simple aliases of the `-default` image.
+A previous image of OpenFOAM v2106 contained OpenFOAM compiled from source on Ubuntu, before the switch to OpenSUSE. This (now deprecated) image is still pullable as `gerlero/openfoam2016-default:ubuntu`.
 
 ## License
 
