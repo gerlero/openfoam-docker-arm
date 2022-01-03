@@ -45,7 +45,7 @@ jobs:
         name: Test '-run' image
         run: |
           ./openfoam-docker-arm -${{ matrix.foam_version }} -run -- foamInstallationTest
-          ./openfoam-docker-arm -${{ matrix.foam_version }} -dev -- icoFoam -help
+          ./openfoam-docker-arm -${{ matrix.foam_version }} -run -- icoFoam -help
         shell: 'script -q -e -c "bash -e {0}"'
       -
         name: Push '-run' image
