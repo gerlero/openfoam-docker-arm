@@ -37,7 +37,7 @@ The `-default` option requests a full environment (including the tutorial suite 
 
 ARM-based OpenFOAM environments are packaged in Docker images based on OpenSUSE Leap, using the official ARM binaries as recommended in the [OpenFOAM Docker FAQ](https://develop.openfoam.com/Development/openfoam/-/wikis/precompiled/docker#frequently-asked-questions). Note that this means that the base Linux distribution differs from the [official Docker images](https://hub.docker.com/u/opencfd), which use Ubuntu. The ARM-based Docker images are built here using GitHub Actions and uploaded to [Docker Hub](https://hub.docker.com/u/gerlero/).
 
-A previous image of OpenFOAM v2106 contained OpenFOAM compiled from source on Ubuntu, before the switch to OpenSUSE. This (now deprecated) image is still pullable as `gerlero/openfoam2016-default:ubuntu`.
+A previous image of OpenFOAM v2106 contained OpenFOAM compiled from source on Ubuntu, before the switch to OpenSUSE. This (now deprecated) image is still pullable as `gerlero/openfoam2106-default:ubuntu`.
 
 ## License
 
