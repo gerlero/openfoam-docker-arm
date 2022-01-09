@@ -1,21 +1,18 @@
-name: CI
+name: build-push
 
 on:
   push:
     branches:
-      - 'main'
+      - v*
 
 jobs:
   docker:
-    name: OpenFOAM v${{ matrix.foam_version }}
+    name: Build and push Docker images
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        foam_version:
-          - '2112'
-          - '2106'
     steps:
+      - name: Set env.FOAM_VERSION
+        run: |
+          echo "FOAM_VERSION=${GITHUB_REF#refs/heads/v}" >> "$GITHUB_ENV"
       -
         name: Checkout
         uses: actions/checkout@v2
@@ -35,79 +32,79 @@ jobs:
         name: Build '-run' image
         uses: docker/build-push-action@v2
         with:
-          build-args: FOAM_VERSION=${{ matrix.foam_version }}
+          build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
           file: openfoam-run_leap.Dockerfile
           context: .
           platforms: linux/arm64
           load: true
-          tags: gerlero/openfoam${{ matrix.foam_version }}-run
+          tags: gerlero/openfoam${{ env.FOAM_VERSION }}-run
       -
         name: Test '-run' image
         run: |
-          ./openfoam-docker-arm -${{ matrix.foam_version }} -run -- foamInstallationTest
-          ./openfoam-docker-arm -${{ matrix.foam_version }} -run -- icoFoam -help
+          ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -run -- foamInstallationTest
+          ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -run -- icoFoam -help
         shell: 'script -q -e -c "bash -e {0}"'
       -
         name: Push '-run' image
         uses: docker/build-push-action@v2
         with:
-          build-args: FOAM_VERSION=${{ matrix.foam_version }}
+          build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
           file: openfoam-run_leap.Dockerfile
           context: .
           platforms: linux/arm64
           push: true
-          tags: gerlero/openfoam${{ matrix.foam_version }}-run
+          tags: gerlero/openfoam${{ env.FOAM_VERSION }}-run
       -
         name: Build '-dev' image
         uses: docker/build-push-action@v2
         with:
-          build-args: FOAM_VERSION=${{ matrix.foam_version }}
+          build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
           file: openfoam-dev_leap.Dockerfile
           context: .
           platforms: linux/arm64
           load: true
-          tags: gerlero/openfoam${{ matrix.foam_version }}-dev
+          tags: gerlero/openfoam${{ env.FOAM_VERSION }}-dev
       -
         name: Test '-dev' image
         run: |
-          ./openfoam-docker-arm -${{ matrix.foam_version }} -dev -- foamInstallationTest
-          ./openfoam-docker-arm -${{ matrix.foam_version }} -dev -- icoFoam -help
+          ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -dev -- foamInstallationTest
+          ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -dev -- icoFoam -help
         shell: 'script -q -e -c "bash -e {0}"'
       -
         name: Push '-dev' image
         uses: docker/build-push-action@v2
         with:
-          build-args: FOAM_VERSION=${{ matrix.foam_version }}
+          build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
           file: openfoam-dev_leap.Dockerfile
           context: .
           platforms: linux/arm64
           push: true
-          tags: gerlero/openfoam${{ matrix.foam_version }}-dev
+          tags: gerlero/openfoam${{ env.FOAM_VERSION }}-dev
       -
         name: Build '-default' image
         uses: docker/build-push-action@v2
         with:
-          build-args: FOAM_VERSION=${{ matrix.foam_version }}
+          build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
           file: openfoam-default_leap.Dockerfile
           context: .
           platforms: linux/arm64
           load: true
-          tags: gerlero/openfoam${{ matrix.foam_version }}-default
+          tags: gerlero/openfoam${{ env.FOAM_VERSION }}-default
       -
         name: Test '-default' image
         run: |
-          ./openfoam-docker-arm -${{ matrix.foam_version }} -default -- foamInstallationTest
-          ./openfoam-docker-arm -${{ matrix.foam_version }} -default -- icoFoam -help
-          ./openfoam-docker-arm -${{ matrix.foam_version }} -default -- foamTestTutorial -full incompressible/simpleFoam/pitzDaily
-          ./openfoam-docker-arm -${{ matrix.foam_version }} -default -- foamTestTutorial -full -parallel basic/laplacianFoam/flange
+          ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -default -- foamInstallationTest
+          ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -default -- icoFoam -help
+          ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -default -- foamTestTutorial -full incompressible/simpleFoam/pitzDaily
+          ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -default -- foamTestTutorial -full -parallel basic/laplacianFoam/flange
         shell: 'script -q -e -c "bash -e {0}"'
       -
         name: Push '-default' image
         uses: docker/build-push-action@v2
         with:
-          build-args: FOAM_VERSION=${{ matrix.foam_version }}
+          build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
           file: openfoam-default_leap.Dockerfile
           context: .
           platforms: linux/arm64
           push: true
-          tags: gerlero/openfoam${{ matrix.foam_version }}-default
+          tags: gerlero/openfoam${{ env.FOAM_VERSION }}-default
