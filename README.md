@@ -1,10 +1,14 @@
 # OpenFOAM for ARM via Docker
 
-[![CI](https://github.com/gerlero/openfoam-docker-arm/actions/workflows/ci.yml/badge.svg)](https://github.com/gerlero/openfoam-docker-arm/actions/workflows/ci.yml)
-
 Precompiled OpenFOAM environments for ARM-based processors via Docker.
 
 **For use on Macs with Apple silicon and other ARM-based computers.**
+
+[![Build status](https://img.shields.io/github/workflow/status/gerlero/openfoam-docker-arm/build-push/v2112?label=v2112)](https://github.com/gerlero/openfoam-docker-arm/tree/v2112) 
+[![Docker Pulls](https://img.shields.io/docker/pulls/gerlero/openfoam2112-run)](https://hub.docker.com/r/gerlero/openfoam2112-run)
+
+[![Build status](https://img.shields.io/github/workflow/status/gerlero/openfoam-docker-arm/build-push/v2106?label=v2106)](https://github.com/gerlero/openfoam-docker-arm/tree/v2106) 
+[![Docker Pulls](https://img.shields.io/docker/pulls/gerlero/openfoam2106-run)](https://hub.docker.com/r/gerlero/openfoam2106-run)
 
 ## Benchmark
 
