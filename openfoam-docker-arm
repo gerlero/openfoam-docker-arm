@@ -2,7 +2,7 @@
 imageBasename="gerlero/openfoam"
 openfoamVersion="2112"
 imageFlavour="-run"
-scriptVersion="2021-12-21"
+scriptVersion="2022-01-10"
 
 #------------------------------------------------------------------------------
 # =========                 |
@@ -30,7 +30,7 @@ scriptVersion="2021-12-21"
 #------------------------------------------------------------------------------
 printHelp()
 {
-    defaultImage="${imageBasename}${openfoamVersion}${imageFlavour}"
+    defaultImage="${imageBasename}${imageFlavour}:${openfoamVersion}"
 
     cat<<HELP_HEAD
 
@@ -55,10 +55,13 @@ if [ -n "$1" ]
 then
 cat<<'HELP_FULL'
   -entry=PATH       Alternative entry point
-  -image=NAME       Specify image
+  -image=NAME | -i=NAME
+                    Specify image to run
+  -docker           Use docker (default)
   -podman           Use podman instead of docker
   -sudo             Prefix container calls with 'sudo'
   -xhost            Allow container access to host network (implies -X)
+  --shm-size=BYTES  Size of /dev/shm (eg, --shm-size=4G)
 HELP_FULL
 fi
 
@@ -138,6 +141,9 @@ container_tmphome='/tmp/.home.openfoam' # Fake home for container user
 
 #------------------------------------------------------------------------------
 
+# Select 'podman' toolchain if mentioned in script name:
+case "${0##*/}" in (*-podman*) toolChain=podman;; esac
+
 # Get openfoam version and/or image flavour from script name
 # "/path/openfoam{VERSION}"
 # "/path/openfoam{VERSION}-{FLAVOUR}"
@@ -173,7 +179,7 @@ esac
 
 unset image sudo
 unset mount1Dir mount2Dir
-unset optDryrun optEntrypoint optShellCommand optUpdate optVerbose
+unset optDryrun optEntrypoint optShellCommand optUpdate optVerbose optShmSize
 unset optX11Forwarding
 
 while [ "$#" -gt 0 ]
@@ -200,15 +206,25 @@ do
         optShellCommand="-c"
         ;;
 
-    -help-f*)   # Full help
+    (-help-f*)   # Full help
         printHelp -full
         ;;
 
-    -h | -help* | --help*)  # Short help
+    (-h | -help* | --help*)  # Short help
         printHelp
         ;;
 
-    -case)
+    (-docker | -podman)
+        toolChain="${1#*-}"
+        ;;
+    (-sudo)     # Use sudo
+        sudo="sudo"
+        ;;
+    (--shm-size=*)
+        optShmSize="${1#*=}"
+        ;;
+
+    (-case)
         # OpenFOAM-style '-case' for specfying the HOME mount
         [ "$#" -ge 2 ] || die "'$1' option requires an argument"
         shift
@@ -216,29 +232,26 @@ do
         ;;
 
     # Various ways to specify the HOME mount
-    -case=* | -dir=* | -home=*)
+    (-case=* | -dir=* | -home=*)
         mount1Dir="${1#*=}"
         ;;
 
     # Additional DATA mount
-    -data=*)
+    (-data=*)
         mount2Dir="${1#*=}"
         ;;
-    -entry=*)   # Alternative entrypoint
+    (-entry=*)            # Alternative entrypoint
         optEntrypoint="${1#*=}"
         ;;
-    -image=*)   # Alternative image name
+    (-i=* | -image=*)     # Alternative image name
         image="${1#*=}"
         ;;
 
-    (-update | -upgrade)   # Also allow 'upgrade' (for Ubunutu people)
+    (-update | -upgrade)  # Also allow 'upgrade' (for Ubunutu people)
         optUpdate=true
         ;;
     (-dry-run | -dryrun)
         optDryrun=true
-        ;;
-    (-sudo)     # Use sudo
-        sudo="sudo"
         ;;
     (-verbose)
         optVerbose=true
@@ -254,14 +267,10 @@ do
         optX11Forwarding="host"
         ;;
 
-    (-podman)   # Use podman instead of docker
-        toolChain="podman"
-        ;;
-
-    -*)
+    (-*)
         die "Invalid option '$1'"
         ;;
-    *)
+    (*)
         if [ -n "$optShellCommand" ]
         then
             break
@@ -275,7 +284,7 @@ done
 
 if [ -z "$image" ]
 then
-    image="${imageBasename}${openfoamVersion}${imageFlavour}"
+    image="${imageBasename}${imageFlavour}:${openfoamVersion}"
 fi
 
 if [ -n "$optUpdate" ]
@@ -419,12 +428,13 @@ then
     set -x
 fi
 
-$runPrefix ${toolChain:?} run \
+exec $runPrefix ${toolChain:?} run \
     --rm -t -i \
     --user="$guest_uid:$guest_gid" \
     ${mount1Dir:+--volume="$mount1Dir:$container_home"} \
     ${mount2Dir:+--volume="$mount2Dir:/data"} \
     $(x11Mapping) \
+    ${optShmSize:+--shm-size="$optShmSize"} \
     ${optEntrypoint:+--entrypoint="$optEntrypoint"} \
     "$image" $optShellCommand "$@"
 
