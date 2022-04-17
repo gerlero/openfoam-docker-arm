@@ -1,6 +1,6 @@
 #!/bin/sh
+openfoamVersion="latest"
 imageBasename="gerlero/openfoam"
-openfoamVersion="2112"
 imageFlavour="-run"
 scriptVersion="2022-01-10"
 
