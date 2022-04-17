@@ -13,7 +13,7 @@
 # ---------------------------------------------------------------------------
 ARG FOAM_VERSION=2112
 
-FROM gerlero/openfoam${FOAM_VERSION}-run
+FROM gerlero/openfoam-run:${FOAM_VERSION}
 ARG FOAM_VERSION
 ARG PACKAGE=openfoam${FOAM_VERSION}-devel
 
