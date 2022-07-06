@@ -1,9 +1,12 @@
 # OpenFOAM for ARM via Docker
 
+| ✨ OpenFOAM v2206 is now available (and will be used by default) |
+| ---- |
+
 | 🖥  Using a Mac? If so, you may also want to check out my [native OpenFOAM builds for macOS.](https://github.com/gerlero/openfoam-app) |
 | ---- |
 
-[![Build status](https://img.shields.io/github/workflow/status/gerlero/openfoam-docker-arm/build-push/v2112?label=v2112)](https://github.com/gerlero/openfoam-docker-arm/tree/v2112) [![Build status](https://img.shields.io/github/workflow/status/gerlero/openfoam-docker-arm/build-push/v2106?label=v2106)](https://github.com/gerlero/openfoam-docker-arm/tree/v2106) [![homebrew](https://img.shields.io/badge/homebrew-gerlero%2Fopenfoam%2Fopenfoam--docker--arm-informational)](https://github.com/gerlero/homebrew-openfoam)
+[![Build status](https://img.shields.io/github/workflow/status/gerlero/openfoam-docker-arm/build-push/v2206?label=v2206)](https://github.com/gerlero/openfoam-docker-arm/tree/v2206) [![Build status](https://img.shields.io/github/workflow/status/gerlero/openfoam-docker-arm/build-push/v2112?label=v2112)](https://github.com/gerlero/openfoam-docker-arm/tree/v2112) [![Build status](https://img.shields.io/github/workflow/status/gerlero/openfoam-docker-arm/build-push/v2106?label=v2106)](https://github.com/gerlero/openfoam-docker-arm/tree/v2106) [![homebrew](https://img.shields.io/badge/homebrew-gerlero%2Fopenfoam%2Fopenfoam--docker--arm-informational)](https://github.com/gerlero/homebrew-openfoam)
 
 Precompiled OpenFOAM environments for ARM-based processors via Docker.
 
@@ -42,7 +45,7 @@ Then, launch an ARM-based OpenFOAM environment at any time using the script. For
 openfoam-docker-arm -default
 ```
 
-The `-default` option requests a full environment (including the tutorial suite and dependencies needed for OpenFOAM development). To ask for a specific OpenFOAM version, pass the version number as an option (e.g., `-2112` or `-2106`). For help on how to use the script and OpenFOAM with Docker in general, use the `-help` option and/or check out the [OpenFOAM Docker page](https://develop.openfoam.com/Development/openfoam/-/wikis/precompiled/docker).
+The `-default` option requests a full environment (including the tutorial suite and dependencies needed for OpenFOAM development). To ask for a specific OpenFOAM version, pass the version number as an option (e.g., `-2206`, `-2112` or `-2106`). For help on how to use the script and OpenFOAM with Docker in general, use the `-help` option and/or check out the [OpenFOAM Docker page](https://develop.openfoam.com/Development/openfoam/-/wikis/precompiled/docker).
 
 ## Details
 
