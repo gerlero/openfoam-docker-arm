@@ -1,8 +1,5 @@
 # OpenFOAM for ARM via Docker
 
-| ✨ OpenFOAM v2206 is now available (and will be used by default) |
-| ---- |
-
 | 🖥  Using a Mac? If so, you may also want to check out my [native OpenFOAM builds for macOS.](https://github.com/gerlero/openfoam-app) |
 | ---- |
 
