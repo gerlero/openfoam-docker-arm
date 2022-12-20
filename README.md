@@ -3,7 +3,10 @@
 | 🖥  Using a Mac? If so, you may also want to check out my [native OpenFOAM builds for macOS.](https://github.com/gerlero/openfoam-app) |
 | ---- |
 
-[![Build status](https://img.shields.io/github/workflow/status/gerlero/openfoam-docker-arm/build-push/v2206?label=v2206)](https://github.com/gerlero/openfoam-docker-arm/tree/v2206) [![Build status](https://img.shields.io/github/workflow/status/gerlero/openfoam-docker-arm/build-push/v2112?label=v2112)](https://github.com/gerlero/openfoam-docker-arm/tree/v2112) [![Build status](https://img.shields.io/github/workflow/status/gerlero/openfoam-docker-arm/build-push/v2106?label=v2106)](https://github.com/gerlero/openfoam-docker-arm/tree/v2106) [![homebrew](https://img.shields.io/badge/homebrew-gerlero%2Fopenfoam%2Fopenfoam--docker--arm-informational)](https://github.com/gerlero/homebrew-openfoam)
+[![Build status](https://img.shields.io/github/actions/workflow/status/gerlero/openfoam-docker-arm/build-push.yml?branch=v2206&label=v2206)](https://github.com/gerlero/openfoam-docker-arm/tree/v2206)
+[![Build status](https://img.shields.io/github/actions/workflow/status/gerlero/openfoam-docker-arm/build-push.yml?branch=v2112&label=v2112)](https://github.com/gerlero/openfoam-docker-arm/tree/v2112)
+[![Build status](https://img.shields.io/github/actions/workflow/status/gerlero/openfoam-docker-arm/build-push.yml?branch=v2106&label=v2106)](https://github.com/gerlero/openfoam-docker-arm/tree/v2106)
+[![homebrew](https://img.shields.io/badge/homebrew-gerlero%2Fopenfoam%2Fopenfoam--docker--arm-informational)](https://github.com/gerlero/homebrew-openfoam)
 
 Precompiled OpenFOAM environments for ARM-based processors via Docker.
 
