@@ -1,27 +1,27 @@
 # ---------------------------------*-sh-*------------------------------------
-# Copyright (C) 2022 OpenCFD Ltd.
+# Copyright (C) 2021-2022 OpenCFD Ltd.
 # SPDX-License-Identifier: (GPL-3.0+)
 #
 # Create openfoam '-run' image for openSUSE using science repo.
 #
 # Example
 #     docker build -f openfoam-run_leap.Dockerfile .
-#     docker build --build-arg OS_VER=15.3 --build-arg FOAM_VERSION=2112 ...
+#     docker build --build-arg OS_VER=15.4 --build-arg FOAM_VERSION=2212 ...
 #
 # ---------------------------------------------------------------------------
-ARG OS_VER=15.3
+ARG OS_VER=15.4
 
 FROM opensuse/leap:${OS_VER} AS distro
 
 FROM distro AS runtime
-ARG FOAM_VERSION=2112
+ARG FOAM_VERSION=2212
 ARG PACKAGE=openfoam${FOAM_VERSION}
 
 RUN zypper -n install -y \
     nano wget rsync sudo nss_wrapper \
- && zypper  -n addrepo -f --no-gpgcheck \
-    'https://download.opensuse.org/repositories/science/openSUSE_Leap_$releasever/' science \
- && zypper install -y ${PACKAGE} \
+ && wget -q -O - https://dl.openfoam.com/add-science-repo.sh | bash \
+ && zypper -n --gpg-auto-import-keys refresh science \
+ && zypper -n install -y ${PACKAGE} \
  && zypper -n clean
 
 # ---------------

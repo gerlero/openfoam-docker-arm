@@ -1,7 +1,7 @@
 # --------------------------------*- sh -*-----------------------------------
 # File: /openfoam/assets/post-install.sh
 #
-# Copyright (C) 2020-2021 OpenCFD Ltd.
+# Copyright (C) 2020-2022 OpenCFD Ltd.
 # SPDX-License-Identifier: (GPL-3.0+)
 #
 # A post-installation setup adjustment (OpenFOAM container environment)
@@ -11,6 +11,7 @@
 # ------------------------------------------------------------------------
 sudo_user=sudofoam
 
+echo "# Configuring post-install as user:$(id -u) ..." 1>&2
 # Parse options
 while [ "$#" -gt 0 ]
 do
@@ -20,6 +21,14 @@ do
 
     (-no-sudo)
         unset sudo_user ;;
+
+    (-upgrade=*)
+        if [ -d /openfoam ]
+        then
+            echo "# Add upgrade warning: ${1#*=}" 1>&2
+            echo "Upgrade to image: ${1#*=}" >| /openfoam/warn-upgrade
+        fi
+        ;;
 
     # Correct some permissions (or use fix-perms.sh beforehand)
     (-fix-perms)
@@ -139,7 +148,7 @@ fi
 
 
 # Find the (latest) installed version
-unset prefix projectDir
+unset prefix projectDir version
 findLatestOpenFOAM()
 {
     prefix="$1"
@@ -164,7 +173,8 @@ fi
 if [ -d "$projectDir" ]
 then
     package="${projectDir##*/}"
-    echo "# Found openfoam=$package prefix=${prefix:-/}" 1>&2
+    version="$("$projectDir"/bin/foamEtcFile -show-api 2>/dev/null)"
+    echo "# Found openfoam=$package prefix=${prefix:-/} api=${version:-[]}" 1>&2
 
     # Disposable 'sandbox'
     sandbox="$projectDir/sandbox"
@@ -179,10 +189,33 @@ then
 
 else
     echo "Warning: cannot find latest openfoam package" 1>&2
-    echo "  /etc/profile.d/openfoam.sh - may require further adjustment" 1>&2
+    echo "  /etc/profile.d/openfoam-99run.sh - may require further adjustment" 1>&2
 
     # Generate /etc/profile.d/openfoam-99run.sh
     cp -f /openfoam/assets/profile.sh.in /etc/profile.d/openfoam-99run.sh
+fi
+
+
+if [ -d /.singularity.d/env ]
+then
+    envfile="$APPTAINER_ENVIRONMENT"
+    [ -n "$envfile" ] || envfile="$SINGULARITY_ENVIRONMENT"
+
+    # A nice looking PS1 string for apptainer (singularity)
+    if [ -n "$envfile" ]
+    then
+        echo "# Add to environment: $envfile" 1>&2
+        echo "export PS1='apptainer-openfoam${version}:\\w/\\n\\u\\\$ '" >> "$envfile"
+        #?? chmod 0644 "$envfile"
+    fi
+
+    # Prior to apptainer 1.1.5, PS1 was unconditionally overwritten
+    envfile="/.singularity.d/env/99-base.sh"
+    if [ -f "$envfile" ]
+    then
+        echo "# Adjust environment: $envfile" 1>&2
+        sed -i -e 's@^PS1=\("[^"]*"\)@: "${PS1:=Apptainer> }"@' "$envfile"
+    fi
 fi
 
 
@@ -230,7 +263,9 @@ then
     fi
 fi
 
+
 # Permissions
+
 for i in /etc/profile.d/openfoam*.sh
 do
     if [ -f "$i" ]

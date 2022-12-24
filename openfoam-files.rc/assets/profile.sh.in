@@ -1,7 +1,7 @@
 # --------------------------------*- sh -*-----------------------------------
 # File: /etc/profile.d/openfoam-99run.sh
 #
-# Copyright (C) 2021 OpenCFD Ltd.
+# Copyright (C) 2021-2022 OpenCFD Ltd.
 # SPDX-License-Identifier: (GPL-3.0+)
 #
 # Environment settings for OpenFOAM (www.openfoam.com)
@@ -9,12 +9,25 @@
 # OpenFOAM version: @PACKAGE@
 # ------------------------------------------------------------------------
 
+unset FOAM_CONTAINER_TYPE
+if [ -e /.singularity.d ]
+then
+    FOAM_CONTAINER_TYPE="apptainer"
+elif [ -e /.dockerenv ]
+then
+    FOAM_CONTAINER_TYPE="docker"
+elif [ -e /run/.containerenv ]
+then
+    # (or check container=podman)
+    FOAM_CONTAINER_TYPE="podman"
+fi
+
 # OpenFOAM environment
 if [ -n "@PACKAGE@" ] && [ -f "@PREFIX@/@PACKAGE@"/etc/bashrc ]
 then
     . "@PREFIX@/@PACKAGE@"/etc/bashrc -- || true
     case "$-" in (*i*)  # Interactive shell
-        PS1="openfoam$(foamEtcFile -show-api 2>/dev/null):"'\w/\n\u\$ '
+        PS1="$FOAM_CONTAINER_TYPE${FOAM_CONTAINER_TYPE:+-}openfoam$(foamEtcFile -show-api 2>/dev/null):"'\w/\n\u\$ '
         alias sandbox='cd ${WM_PROJECT_DIR:?}/sandbox'
     esac  # Interactive shell
 fi

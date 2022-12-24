@@ -1,13 +1,26 @@
 # --------------------------------*- sh -*-----------------------------------
 # File: /openfoam/assets/welcome.sh
 #
-# Copyright (C) 2020-2021 OpenCFD Ltd.
+# Copyright (C) 2020-2022 OpenCFD Ltd.
 # Copyright (C) 2021 Gabriel S. Gerlero
 # SPDX-License-Identifier: (GPL-3.0+)
 #
 # General information to display on startup (interactive shell)
 #
 # ------------------------------------------------------------------------
+unset optBrief
+
+# Parse options
+while [ "$#" -gt 0 ]
+do
+    case "$1" in
+    (-brief)
+        optBrief=true
+        ;;
+    esac
+    shift
+done
+
 
 # Operating system name (may not be apparent for the user)
 unset PRETTY_NAME
@@ -65,11 +78,26 @@ else
     unset projectDir
 fi
 
+# Build information - stringify like OpenFOAM output
+unset build_string
+if [ -n "$foam_api" ]
+then
+    build_string="${foam_build}${foam_build:+ }OPENFOAM=${foam_api}${foam_patch:+ patch=${foam_patch}}"
+fi
 
 # ---------------------------------------------------------------------------
 # Output
 
 exec 1>&2
+
+if [ "$optBrief" = true ]
+then
+    echo "System   :  ${PRETTY_NAME:-[]}${sudo_user:+  (admin user: $sudo_user)}"
+    echo "OpenFOAM :  ${projectDir:-[]}"
+    echo "Build    :  ${build_string:-[]}"
+    exit 0
+fi
+
 cat<< '__BANNER__'
 ---------------------------------------------------------------------------
   =========                 |
@@ -88,16 +116,11 @@ cat<< __NOTES__
 ---------------------------------------------------------------------------
 System   :  ${PRETTY_NAME:-[]}${sudo_user:+  (admin user: $sudo_user)}
 OpenFOAM :  ${projectDir:-[]}
+Build    :  ${build_string:-[]}
 __NOTES__
 
-# Build information - stringify like OpenFOAM output
-string="$foam_build"
-if [ -n "$foam_api" ]
+if [ -n "$build_string" ]
 then
-    string="${string}${string:+ }OPENFOAM=${foam_api}"
-    [ -n "$foam_patch" ] && string="${string} patch=${foam_patch:-[]}"
-
-    echo "Build    :  $string"
     cat<< '__NOTES__'
 
 Note
@@ -109,7 +132,6 @@ __NOTES__
 fi
 
 cat<< '__FOOTER__'
-
 ---------------------------------------------------------------------------
 __FOOTER__
 

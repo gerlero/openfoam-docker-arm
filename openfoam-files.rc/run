@@ -1,7 +1,7 @@
 #!/bin/sh
 # File: /openfoam/run
 # ----------------------------------------------------------------------
-# Copyright (C) 2020-2021 OpenCFD Ltd.
+# Copyright (C) 2020-2022 OpenCFD Ltd.
 # SPDX-License-Identifier: (GPL-3.0+)
 #
 # Entry-point for OPENFOAM container with nss-wrapper for user/group
@@ -18,6 +18,7 @@
 #     Embedded commands may trigger a "failed to resize tty..."
 #     spurious warning.
 #
+#     The libnss wrapper is not required for apptainer/singularity
 # ----------------------------------------------------------------------
 unset _foamScriptCommand
 
@@ -112,11 +113,50 @@ fi
 # ----------------------------------------------------------------------
 
 # Wrapping user/group
+# [not needed for apptainer/singularity]
 withUID="$(id -u)"
 withGID="$(id -g)"
+unset libnss_wrapper
 
-if [ "$withUID" != 0 ]
+if [ "$withUID" != 0 ] \
+&& [ -z "$APPTAINER_ENVIRONMENT$SINGULARITY_ENVIRONMENT" ]
 then
+    # libnss
+    # - /usr/lib64 : opensuse, redhat8
+    # - /usr/lib   : debian, older ubuntu
+    # - /usr/lib/x86_64-linux-gnu : ubuntu
+
+    # Handle debian multi-arch,
+    # but dpkg-architecture command may also be missing
+    target_multiarch="$DEB_TARGET_MULTIARCH"
+    if [ -z "$target_multiarch" ] && [ -f /etc/debian_version ]
+    then
+        target_multiarch="$(dpkg-architecture -qDEB_TARGET_MULTIARCH 2>/dev/null)"
+        if [ -z "$target_multiarch" ]
+        then
+            # Reasonable guess at a multi-arch name (eg, x86_64-linux-gnu)
+            target_multiarch="$(uname -m)-linux-gnu"
+        fi
+    fi
+
+    for testfile in \
+        /usr/lib64/libnss_wrapper.so \
+        /usr/lib/"${target_multiarch}${target_multiarch:+/}"libnss_wrapper.so \
+        /usr/lib/libnss_wrapper.so \
+    ;
+    do
+        if [ -e "$testfile" ]
+        then
+            libnss_wrapper="$testfile"
+            break
+        fi
+    done
+fi
+
+if [ -n "$libnss_wrapper" ]
+then
+    export LD_PRELOAD="$libnss_wrapper"
+
     export USER=openfoam
     export HOME="/home/${USER}"
     export SHELL="/bin/bash"
@@ -131,33 +171,43 @@ then
 
     # passwd
     echo "${USER}:x:${withUID}:${withGID}:${USER}:${HOME}:${SHELL}" > "$NSS_WRAPPER_PASSWD"
-
-    # opensuse: /usr/lib64
-    LD_PRELOAD=/usr/lib64/libnss_wrapper.so
-
-    # debian/ubuntu: /usr/lib
-    [ -e "$LD_PRELOAD" ] || LD_PRELOAD=/usr/lib/libnss_wrapper.so
-
-    export LD_PRELOAD
 fi
 
 # Normally want to work from home
-cd "${HOME}" 2>/dev/null
-unset OLDPWD
+# [not needed for apptainer/singularity where the binds are OK]
+if [ -z "$APPTAINER_ENVIRONMENT$SINGULARITY_ENVIRONMENT" ]
+then
+    cd "${HOME}" 2>/dev/null
+    unset OLDPWD
+fi
 
 # ----------------------------------------------------------------------
 
-# Dispatch: interactive/non-interactive
+unset warn_upgrade
 
+if [ -f /openfoam/warn-upgrade ]
+then
+    warn_upgrade=true
+    echo "#################################" 1>&2
+    echo "WARNING: using a deprecated image" 1>&2
+    echo "#################################" 1>&2
+    echo 1>&2
+    cat /openfoam/warn-upgrade 1>&2
+    echo 1>&2
+    echo "#################################" 1>&2
+fi
+
+# Dispatch: interactive/non-interactive
 if [ "$#" -eq 0 ] && [ -z "$_foamScriptCommand" ]
 then
     # Interactive shell
     # -----------------
-    export SHELL="/bin/bash"
 
     if [ -f /openfoam/assets/welcome.sh ]
-    then sh /openfoam/assets/welcome.sh
+    then sh /openfoam/assets/welcome.sh ${warn_upgrade:+-brief}
     fi
+
+    export SHELL="/bin/bash"
 
     # RedHat has /etc/bashrc (bad to edit), and no /etc/bash.bashrc
     # Inject our own bashrc file
@@ -172,34 +222,26 @@ then
 fi
 
 
-# Non-interactive shell,
-# probably non-login as well
+# Non-interactive shell (probably non-login as well)
 # ---------------------
 
-# Source bashrc within a function to preserve command-line arguments
-# Suppresses aliases as a side-effect, but non-interactive anyhow.
-sourceBashrc()
-{
-    if [ -f /openfoam/profile.rc ]
-    then  . /openfoam/profile.rc
-    fi
-}
-
+# Preserve arguments when sourcing
+if [ -f /openfoam/profile.rc ]
+then  . /openfoam/profile.rc '' || true
+fi
 
 if [ -n "$_foamScriptCommand" ]
 then
     # A shell command
-    sourceBashrc
     exec /bin/bash -c "$@"
-    exit $? # Safety
+    exitCode="$?"  # Safety
+    echo "Failed to exec: bash -c $@" 1>&2
+else
+    # An application
+    exec "$@"
+    exitCode="$?"  # Safety
+    echo "Failed to exec: $@" 1>&2
 fi
-
-
-# An application
-sourceBashrc
-exec "$@"
-exitCode="$?"  # Safety
-echo "Failed to exec: $@" 1>&2
 
 exit "$exitCode"
 
