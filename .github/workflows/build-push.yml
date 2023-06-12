@@ -31,7 +31,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
         name: Build '-run' image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
           file: openfoam-run_leap.Dockerfile
@@ -47,7 +47,7 @@ jobs:
         shell: 'script -q -e -c "bash -e {0}"'
       -
         name: Push '-run' image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
           file: openfoam-run_leap.Dockerfile
@@ -57,7 +57,7 @@ jobs:
           tags: gerlero/openfoam-run:${{ env.FOAM_VERSION }}
       -
         name: Build '-dev' image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
           file: openfoam-dev_leap.Dockerfile
@@ -73,7 +73,7 @@ jobs:
         shell: 'script -q -e -c "bash -e {0}"'
       -
         name: Push '-dev' image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
           file: openfoam-dev_leap.Dockerfile
@@ -83,7 +83,7 @@ jobs:
           tags: gerlero/openfoam-dev:${{ env.FOAM_VERSION }}
       -
         name: Build '-default' image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
           file: openfoam-default_leap.Dockerfile
@@ -101,7 +101,7 @@ jobs:
         shell: 'script -q -e -c "bash -e {0}"'
       -
         name: Push '-default' image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
           file: openfoam-default_leap.Dockerfile
