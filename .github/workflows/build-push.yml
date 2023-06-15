@@ -1,105 +1,90 @@
-name: build-push
+name: Build images
 
 on:
   push:
     branches:
-      - v*
-  workflow_dispatch:
+      - 'v*'
+  workflow_call:
+    inputs:
+      openfoam-version:
+        type: string
+        required: true
+      push:
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   docker:
-    name: Build and push Docker images
     runs-on: ubuntu-latest
     steps:
-      - name: Set env.FOAM_VERSION
+      - name: Set env.FOAM_VERSION from branch name
+        if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/heads/v') }}
         run: |
           echo "FOAM_VERSION=${GITHUB_REF#refs/heads/v}" >> "$GITHUB_ENV"
-      -
-        name: Checkout
+      - name: Set env.FOAM_VERSION from workflow input
+        if: ${{ github.event_name != 'push' || !startsWith(github.ref, 'refs/heads/v') }}
+        run: |
+          echo "FOAM_VERSION=${{ inputs.openfoam-version }}" >> "$GITHUB_ENV"
+      - name: Checkout
         uses: actions/checkout@v3
-      -
-        name: Set up QEMU
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
-      -
-        name: Set up Docker Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      -
-        name: Login to DockerHub
+      - name: Login to DockerHub
+        if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/heads/v') || inputs.push }}
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Build '-run' image
+      - name: Build '-run' image
         uses: docker/build-push-action@v4
         with:
+          context: .
           build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
           target: run
           platforms: linux/arm64
           load: true
           tags: gerlero/openfoam-run:${{ env.FOAM_VERSION }}
-      -
-        name: Test '-run' image
+      - name: Test '-run' image
         run: |
           ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -run -- foamInstallationTest
           ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -run -- icoFoam -help
         shell: 'script -q -e -c "bash -e {0}"'
-      -
-        name: Push '-run' image
+      - name: Build '-dev' image
         uses: docker/build-push-action@v4
         with:
-          build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
-          target: run
-          platforms: linux/arm64
-          push: true
-          tags: gerlero/openfoam-run:${{ env.FOAM_VERSION }}
-      -
-        name: Build '-dev' image
-        uses: docker/build-push-action@v4
-        with:
+          context: .
           build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
           target: dev
           platforms: linux/arm64
           load: true
           tags: gerlero/openfoam-dev:${{ env.FOAM_VERSION }}
-      -
-        name: Test '-dev' image
+      - name: Test '-dev' image
         run: |
           ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -dev -- foamInstallationTest
           ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -dev -- icoFoam -help
         shell: 'script -q -e -c "bash -e {0}"'
-      -
-        name: Push '-dev' image
+      - name: Build '-default' image
         uses: docker/build-push-action@v4
         with:
-          build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
-          target: dev
-          platforms: linux/arm64
-          push: true
-          tags: gerlero/openfoam-dev:${{ env.FOAM_VERSION }}
-      -
-        name: Build '-default' image
-        uses: docker/build-push-action@v4
-        with:
+          context: .
           build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
           target: default
           platforms: linux/arm64
           load: true
           tags: gerlero/openfoam-default:${{ env.FOAM_VERSION }}
-      -
-        name: Test '-default' image
+      - name: Test '-default' image
         run: |
           ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -default -- foamInstallationTest
           ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -default -- icoFoam -help
           ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -default -- foamTestTutorial -full incompressible/simpleFoam/pitzDaily
           ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -default -- foamTestTutorial -full -parallel basic/laplacianFoam/flange
         shell: 'script -q -e -c "bash -e {0}"'
-      -
-        name: Push '-default' image
-        uses: docker/build-push-action@v4
-        with:
-          build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
-          target: default
-          platforms: linux/arm64
-          push: true
-          tags: gerlero/openfoam-default:${{ env.FOAM_VERSION }}
+      - name: Push images
+        if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/heads/v') || inputs.push }}
+        run: |
+          docker push gerlero/openfoam-run:${{ env.FOAM_VERSION }}
+          docker push gerlero/openfoam-dev:${{ env.FOAM_VERSION }}
+          docker push gerlero/openfoam-default:${{ env.FOAM_VERSION }}

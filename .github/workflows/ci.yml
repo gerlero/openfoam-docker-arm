@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  ci:
+    strategy:
+      matrix:
+        openfoam-version: [2212, 2206, 2112, 2106]
+      fail-fast: false
+    uses: ./.github/workflows/build-push.yml
+    with:
+      openfoam-version: ${{ matrix.openfoam-version }}
+      push: false
