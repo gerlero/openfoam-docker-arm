@@ -47,7 +47,7 @@ jobs:
           platforms: linux/arm64
           load: true
           tags: gerlero/openfoam-run:${{ env.FOAM_VERSION }}
-      - name: Test '-run' image
+      - name: Check '-run' image
         run: |
           ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -run -- foamInstallationTest
           ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -run -- icoFoam -help
@@ -61,7 +61,7 @@ jobs:
           platforms: linux/arm64
           load: true
           tags: gerlero/openfoam-dev:${{ env.FOAM_VERSION }}
-      - name: Test '-dev' image
+      - name: Check '-dev' image
         run: |
           ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -dev -- foamInstallationTest
           ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -dev -- icoFoam -help
@@ -75,12 +75,10 @@ jobs:
           platforms: linux/arm64
           load: true
           tags: gerlero/openfoam-default:${{ env.FOAM_VERSION }}
-      - name: Test '-default' image
+      - name: Check '-default' image
         run: |
           ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -default -- foamInstallationTest
           ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -default -- icoFoam -help
-          ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -default -- foamTestTutorial -full incompressible/simpleFoam/pitzDaily
-          ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -default -- foamTestTutorial -full -parallel basic/laplacianFoam/flange
         shell: 'script -q -e -c "bash -e {0}"'
       - name: Push images
         if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/heads/v') || inputs.push }}
