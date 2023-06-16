@@ -1,7 +1,7 @@
 # --------------------------------*- sh -*-----------------------------------
 # File: /openfoam/assets/post-install.sh
 #
-# Copyright (C) 2020-2022 OpenCFD Ltd.
+# Copyright (C) 2020-2023 OpenCFD Ltd.
 # SPDX-License-Identifier: (GPL-3.0+)
 #
 # A post-installation setup adjustment (OpenFOAM container environment)
@@ -23,10 +23,11 @@ do
         unset sudo_user ;;
 
     (-upgrade=*)
-        if [ -d /openfoam ]
+        message="${1#*=}"
+        if [ -d /openfoam ] && [ -n "$message" ]
         then
-            echo "# Add upgrade warning: ${1#*=}" 1>&2
-            echo "Upgrade to image: ${1#*=}" >| /openfoam/warn-upgrade
+            echo "# Add upgrade warning: ${message}" 1>&2
+            echo "Upgrade to image: ${message}" >> /openfoam/warn-upgrade
         fi
         ;;
 
@@ -168,13 +169,25 @@ else
 fi
 
 
-# Create/update profile
+# Create/update profile and links
 
 if [ -d "$projectDir" ]
 then
     package="${projectDir##*/}"
     version="$("$projectDir"/bin/foamEtcFile -show-api 2>/dev/null)"
     echo "# Found openfoam=$package prefix=${prefix:-/} api=${version:-[]}" 1>&2
+
+    # Link shell wrapper /usr/bin/openfoam to /usr/bin/openfoamVERSION
+    # to provide an alternative uniform entry point
+    if [ -n "$version" ] && [ -f "/usr/bin/openfoam${version}" ]
+    then
+    (
+        cd /usr/bin && ln -sf "openfoam${version}" openfoam
+        echo "# Update /usr/bin/openfoam -> openfoam${version}" 1>&2
+    )
+    else
+        echo "# WARNING: no /usr/bin/openfoam${version} wrapper found" 1>&2
+    fi
 
     # Disposable 'sandbox'
     sandbox="$projectDir/sandbox"

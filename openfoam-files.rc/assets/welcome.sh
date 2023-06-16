@@ -2,7 +2,7 @@
 # File: /openfoam/assets/welcome.sh
 #
 # Copyright (C) 2020-2022 OpenCFD Ltd.
-# Copyright (C) 2021 Gabriel S. Gerlero
+# Copyright (C) 2021-2023 Gabriel Gerlero
 # SPDX-License-Identifier: (GPL-3.0+)
 #
 # General information to display on startup (interactive shell)
@@ -92,9 +92,14 @@ exec 1>&2
 
 if [ "$optBrief" = true ]
 then
-    echo "System   :  ${PRETTY_NAME:-[]}${sudo_user:+  (admin user: $sudo_user)}"
-    echo "OpenFOAM :  ${projectDir:-[]}"
-    echo "Build    :  ${build_string:-[]}"
+    cat<< __BRIEF__
+---------------------------------------------------------------------------
+System   :  ${PRETTY_NAME:-[]}${sudo_user:+  (admin user: $sudo_user)}
+OpenFOAM :  ${projectDir:-[]}
+Build    :  ${build_string:-[]}
+Website  :  www.openfoam.com
+---------------------------------------------------------------------------
+__BRIEF__
     exit 0
 fi
 
