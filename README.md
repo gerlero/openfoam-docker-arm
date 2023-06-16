@@ -7,6 +7,7 @@
 [![Build status](https://img.shields.io/github/actions/workflow/status/gerlero/openfoam-docker-arm/build-push.yml?branch=v2206&label=v2206)](https://github.com/gerlero/openfoam-docker-arm/tree/v2206)
 [![Build status](https://img.shields.io/github/actions/workflow/status/gerlero/openfoam-docker-arm/build-push.yml?branch=v2112&label=v2112)](https://github.com/gerlero/openfoam-docker-arm/tree/v2112)
 [![Build status](https://img.shields.io/github/actions/workflow/status/gerlero/openfoam-docker-arm/build-push.yml?branch=v2106&label=v2106)](https://github.com/gerlero/openfoam-docker-arm/tree/v2106)
+[![Build status](https://img.shields.io/github/actions/workflow/status/gerlero/openfoam-docker-arm/build-push.yml?branch=v2012&label=v2012)](https://github.com/gerlero/openfoam-docker-arm/tree/v2012)
 [![homebrew](https://img.shields.io/badge/homebrew-gerlero%2Fopenfoam%2Fopenfoam--docker--arm-informational)](https://github.com/gerlero/homebrew-openfoam)
 
 Precompiled OpenFOAM environments for ARM-based processors via Docker.
