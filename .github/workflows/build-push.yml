@@ -34,8 +34,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
-          file: openfoam-run_leap.Dockerfile
-          context: .
+          target: run
           platforms: linux/arm64
           load: true
           tags: gerlero/openfoam-run:${{ env.FOAM_VERSION }}
@@ -50,8 +49,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
-          file: openfoam-run_leap.Dockerfile
-          context: .
+          target: run
           platforms: linux/arm64
           push: true
           tags: gerlero/openfoam-run:${{ env.FOAM_VERSION }}
@@ -60,8 +58,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
-          file: openfoam-dev_leap.Dockerfile
-          context: .
+          target: dev
           platforms: linux/arm64
           load: true
           tags: gerlero/openfoam-dev:${{ env.FOAM_VERSION }}
@@ -76,8 +73,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
-          file: openfoam-dev_leap.Dockerfile
-          context: .
+          target: dev
           platforms: linux/arm64
           push: true
           tags: gerlero/openfoam-dev:${{ env.FOAM_VERSION }}
@@ -86,8 +82,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
-          file: openfoam-default_leap.Dockerfile
-          context: .
+          target: default
           platforms: linux/arm64
           load: true
           tags: gerlero/openfoam-default:${{ env.FOAM_VERSION }}
@@ -104,8 +99,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
-          file: openfoam-default_leap.Dockerfile
-          context: .
+          target: default
           platforms: linux/arm64
           push: true
           tags: gerlero/openfoam-default:${{ env.FOAM_VERSION }}
