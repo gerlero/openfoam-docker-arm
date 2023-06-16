@@ -9,6 +9,8 @@ jobs:
   dockerhub-description:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Update gerlero/openfoam-run
         uses: peter-evans/dockerhub-description@v3
         with:
