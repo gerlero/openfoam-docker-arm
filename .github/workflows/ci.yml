@@ -13,7 +13,7 @@ jobs:
   ci:
     strategy:
       matrix:
-        openfoam-version: [2212, 2206, 2112, 2106]
+        openfoam-version: [2212, 2206, 2112, 2106, 2012]
       fail-fast: false
     uses: ./.github/workflows/build-push.yml
     with:
