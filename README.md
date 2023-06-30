@@ -1,8 +1,12 @@
 # OpenFOAM for ARM via Docker
 
+| ✨ OpenFOAM v2306 is now available (and will be used by default) |
+| ---- |
+
 | 🖥  Using a Mac? If so, you may also want to check out my [native OpenFOAM builds for macOS.](https://github.com/gerlero/openfoam-app) |
 | ---- |
 
+[![Build status](https://img.shields.io/github/actions/workflow/status/gerlero/openfoam-docker-arm/build-push.yml?branch=v2306&label=v2306)](https://github.com/gerlero/openfoam-docker-arm/tree/v2306)
 [![Build status](https://img.shields.io/github/actions/workflow/status/gerlero/openfoam-docker-arm/build-push.yml?branch=v2212&label=v2212)](https://github.com/gerlero/openfoam-docker-arm/tree/v2212)
 [![Build status](https://img.shields.io/github/actions/workflow/status/gerlero/openfoam-docker-arm/build-push.yml?branch=v2206&label=v2206)](https://github.com/gerlero/openfoam-docker-arm/tree/v2206)
 [![Build status](https://img.shields.io/github/actions/workflow/status/gerlero/openfoam-docker-arm/build-push.yml?branch=v2112&label=v2112)](https://github.com/gerlero/openfoam-docker-arm/tree/v2112)
