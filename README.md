@@ -1,7 +1,8 @@
 # OpenFOAM for ARM via Docker
 
-| ✨ OpenFOAM v2306 is now available (and will be used by default) |
+| 📣 As of July 2023, [official Docker images of OpenFOAM v2306](https://hub.docker.com/u/opencfd) now have ARM variants. These are used automatically by the official [`openfoam-docker`](https://develop.openfoam.com/Development/openfoam/-/wikis/precompiled/docker) script on an ARM-based system. |
 | ---- |
+| ⚠️ Prefer using the official images and launch script over the ones from this project. See this [OpenFOAM issue](https://develop.openfoam.com/packaging/containers/-/issues/3) for more information. |
 
 | 🖥  Using a Mac? If so, you may also want to check out my [native OpenFOAM builds for macOS.](https://github.com/gerlero/openfoam-app) |
 | ---- |
