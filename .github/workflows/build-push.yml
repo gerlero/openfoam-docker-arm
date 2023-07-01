@@ -42,7 +42,9 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
+          build-args: |
+            OS_VER=${{ env.FOAM_VERSION <= 2012 && '20.04' || '22.04'}}
+            FOAM_VERSION=${{ env.FOAM_VERSION }}
           target: run
           platforms: linux/arm64
           load: true
@@ -56,7 +58,9 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
+          build-args: |
+            OS_VER=${{ env.FOAM_VERSION <= 2012 && '20.04' || '22.04'}}
+            FOAM_VERSION=${{ env.FOAM_VERSION }}
           target: dev
           platforms: linux/arm64
           load: true
@@ -70,7 +74,9 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
+          build-args: |
+            OS_VER=${{ env.FOAM_VERSION <= 2012 && '20.04' || '22.04'}}
+            FOAM_VERSION=${{ env.FOAM_VERSION }}
           target: default
           platforms: linux/arm64
           load: true
