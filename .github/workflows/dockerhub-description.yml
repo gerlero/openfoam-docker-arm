@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+    paths:
+      - README.md
+      - .github/workflows/dockerhub-description.yml
+  workflow_dispatch:
 
 jobs:
   dockerhub-description:
@@ -11,21 +15,27 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Modify README.md for Docker Hub
+        run: |
+          sed -i "s|^\s*#\s\+\(.\+\)|# [\1]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY)|" README.md
       - name: Update gerlero/openfoam-run
         uses: peter-evans/dockerhub-description@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: gerlero/openfoam-run
+          enable-url-completion: true
       - name: Update gerlero/openfoam-dev
         uses: peter-evans/dockerhub-description@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: gerlero/openfoam-dev
+          enable-url-completion: true
       - name: Update gerlero/openfoam-default
         uses: peter-evans/dockerhub-description@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: gerlero/openfoam-default
+          enable-url-completion: true
