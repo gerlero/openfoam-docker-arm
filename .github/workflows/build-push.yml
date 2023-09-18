@@ -39,7 +39,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build '-run' image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
@@ -53,7 +53,7 @@ jobs:
           ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -run -- icoFoam -help
         shell: 'script -q -e -c "bash -e {0}"'
       - name: Build '-dev' image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
@@ -67,7 +67,7 @@ jobs:
           ./openfoam-docker-arm -${{ env.FOAM_VERSION }} -dev -- icoFoam -help
         shell: 'script -q -e -c "bash -e {0}"'
       - name: Build '-default' image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           build-args: FOAM_VERSION=${{ env.FOAM_VERSION }}
