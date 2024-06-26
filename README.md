@@ -7,6 +7,7 @@
 | 🖥  Using a Mac? If so, you may also want to check out my [native OpenFOAM builds for macOS.](https://github.com/gerlero/openfoam-app) |
 | ---- |
 
+[![Build status](https://img.shields.io/badge/v2406-official%20image-green)](https://hub.docker.com/u/opencfd)
 [![Build status](https://img.shields.io/badge/v2312-official%20image-green)](https://hub.docker.com/u/opencfd)
 [![Build status](https://img.shields.io/badge/v2306-official%20image-green)](https://hub.docker.com/u/opencfd)
 [![Build status](https://img.shields.io/github/actions/workflow/status/gerlero/openfoam-docker-arm/build-push.yml?branch=v2212&label=v2212)](https://github.com/gerlero/openfoam-docker-arm/tree/v2212)
