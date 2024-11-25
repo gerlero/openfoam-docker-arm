@@ -19,21 +19,21 @@ jobs:
         run: |
           sed -i "s|^\s*#\s\+\(.\+\)|# [\1]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY)|" README.md
       - name: Update gerlero/openfoam-run
-        uses: peter-evans/dockerhub-description@v3
+        uses: peter-evans/dockerhub-description@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: gerlero/openfoam-run
           enable-url-completion: true
       - name: Update gerlero/openfoam-dev
-        uses: peter-evans/dockerhub-description@v3
+        uses: peter-evans/dockerhub-description@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: gerlero/openfoam-dev
           enable-url-completion: true
       - name: Update gerlero/openfoam-default
-        uses: peter-evans/dockerhub-description@v3
+        uses: peter-evans/dockerhub-description@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
